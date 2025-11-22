@@ -9,32 +9,6 @@ interface NoteListProps {
 }
 
 export const NoteList = ({ notes, selectedNoteId, onSelectNote, decryptedTitles }: NoteListProps) => {
-  const formatDateTime = (dateString: string) => {
-    try {
-      const date = new Date(dateString);
-      const now = new Date();
-      const isToday = date.toDateString() === now.toDateString();
-      
-      if (isToday) {
-        return date.toLocaleTimeString('en-US', { 
-          hour: 'numeric', 
-          minute: '2-digit',
-          hour12: true 
-        });
-      }
-      
-      return date.toLocaleDateString('en-US', { 
-        month: 'short', 
-        day: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true
-      });
-    } catch (error) {
-      return 'Invalid date';
-    }
-  };
-
   if (notes.length === 0) {
     return (
       <div className="p-4 text-center text-sm text-muted-foreground">
@@ -60,9 +34,6 @@ export const NoteList = ({ notes, selectedNoteId, onSelectNote, decryptedTitles 
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium truncate">
                 {decryptedTitles.get(note.id) || 'Untitled'}
-              </p>
-              <p className="text-xs opacity-70">
-                {formatDateTime(note.updated_at || note.created_at)}
               </p>
             </div>
           </div>

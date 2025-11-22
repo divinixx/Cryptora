@@ -66,32 +66,6 @@ export const NoteViewer = ({ note, onUpdate, onDelete }: NoteViewerProps) => {
     }
   };
 
-  const formatDateTime = (dateString: string) => {
-    try {
-      const date = new Date(dateString);
-      const now = new Date();
-      const isToday = date.toDateString() === now.toDateString();
-      
-      if (isToday) {
-        return date.toLocaleTimeString('en-US', { 
-          hour: 'numeric', 
-          minute: '2-digit',
-          hour12: true 
-        });
-      }
-      
-      return date.toLocaleDateString('en-US', { 
-        month: 'short', 
-        day: 'numeric',
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true
-      });
-    } catch (error) {
-      return 'Invalid date';
-    }
-  };
-
   return (
     <div className="h-full flex flex-col">
       <div className="border-b border-border p-4 flex items-center justify-between">
@@ -103,9 +77,9 @@ export const NoteViewer = ({ note, onUpdate, onDelete }: NoteViewerProps) => {
             onChange={(e) => setTitle(e.target.value)}
             className="text-xl font-semibold border-0 bg-transparent px-0 focus-visible:ring-0 focus-visible:ring-offset-0"
           />
-          <p className="text-sm text-muted-foreground mt-1">
-            {isSaving ? 'Saving...' : `Updated ${formatDateTime(note.updated_at || note.created_at)}`}
-          </p>
+          {isSaving && (
+            <p className="text-sm text-muted-foreground mt-1">Saving...</p>
+          )}
         </div>
         <div className="flex gap-2">
           <Button

@@ -101,9 +101,13 @@ export const LandingPage = () => {
           </div>
 
           {/* Right side - Auth form */}
-          <div className="bg-card border border-border rounded-xl p-8 shadow-2xl">
-            <div className="space-y-6">
+          <div className="relative backdrop-blur-xl bg-card/50 border border-border/50 rounded-2xl p-8 shadow-2xl">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/5 rounded-2xl" />
+            <div className="relative space-y-6">
               <div className="text-center space-y-2">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
+                  <Lock className="w-8 h-8 text-primary" />
+                </div>
                 <h2 className="text-2xl font-bold">Start Writing Securely</h2>
                 <p className="text-sm text-muted-foreground">
                   Enter your alias and password to begin
@@ -115,12 +119,11 @@ export const LandingPage = () => {
                   <label className="text-sm font-medium">Your Alias</label>
                   <Input
                     type="text"
-                    placeholder="choose-your-alias"
                     value={alias}
                     onChange={(e) => setAlias(e.target.value)}
                     required
                     disabled={loading}
-                    className="h-12"
+                    className="h-12 bg-background/50 backdrop-blur-sm"
                   />
                 </div>
                 
@@ -128,26 +131,25 @@ export const LandingPage = () => {
                   <label className="text-sm font-medium">Password</label>
                   <Input
                     type="password"
-                    placeholder="••••••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     minLength={4}
                     disabled={loading}
-                    className="h-12"
+                    className="h-12 bg-background/50 backdrop-blur-sm"
                   />
                   <p className="text-xs text-muted-foreground">
                     This encrypts your notes. Keep it safe - we can't recover it.
                   </p>
                 </div>
 
-                <Button type="submit" className="w-full h-12 text-base" disabled={loading}>
+                <Button type="submit" className="w-full h-12 text-base shadow-lg" disabled={loading}>
                   {loading ? 'Loading...' : 'Access Notepad'}
                   {!loading && <ArrowRight className="w-4 h-4 ml-2" />}
                 </Button>
               </form>
 
-              <div className="text-center pt-4 border-t border-border">
+              <div className="text-center pt-4 border-t border-border/50">
                 <p className="text-xs text-muted-foreground">
                   New user? Just enter your details and we'll create your secure notepad automatically.
                 </p>
@@ -159,7 +161,7 @@ export const LandingPage = () => {
 
       <footer className="border-t border-border py-6 backdrop-blur-sm bg-background/80 relative z-10">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>Cryptora © 2025 - Open Source Encrypted Notepad</p>
+          <p>Cryptora © 2025 - Encrypted Notepad</p>
         </div>
       </footer>
     </div>
