@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="frontend/public/favicon.ico" alt="Cryptora Logo" width="80" height="80">
+  <img src="frontend/public/logo.png" alt="Cryptora Logo" width="80" height="80">
 </p>
 
 <h1 align="center">🔐 Cryptora</h1>
