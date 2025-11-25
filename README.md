@@ -306,12 +306,12 @@ Cryptora/
 
 <p align="center">
   <strong>Landing Page</strong><br>
-  <img src="img.png" alt="Cryptora Landing Page" width="100%" style="border-radius: 10px; margin: 10px 0;">
+  <img src="./frontend/public/img.png" alt="Cryptora Landing Page" width="100%" style="border-radius: 10px; margin: 10px 0;">
 </p>
 
 <p align="center">
   <strong>Dashboard - Your Encrypted Notepad</strong><br>
-  <img src="img2.png" alt="Cryptora Dashboard" width="100%" style="border-radius: 10px; margin: 10px 0;">
+  <img src="./frontend/public/img2.png" alt="Cryptora Dashboard" width="100%" style="border-radius: 10px; margin: 10px 0;">
 </p>
 
 ---
