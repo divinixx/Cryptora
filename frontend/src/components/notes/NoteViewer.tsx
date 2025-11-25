@@ -98,16 +98,24 @@ export const NoteViewer = ({ note, onUpdate, onDelete }: NoteViewerProps) => {
           </Button>
         </div>
       </div>
-      <div className="flex-1 p-8 overflow-auto">
-        <div className="max-w-3xl mx-auto">
-          <Textarea
-            placeholder="Start writing..."
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            className="min-h-[500px] resize-none text-base bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-white leading-relaxed"
-          />
-          <div className="mt-8 p-4 bg-secondary rounded-lg flex items-center gap-2 text-sm text-muted-foreground">
-            <Lock className="w-4 h-4" />
+      <div className="flex-1 p-6 overflow-auto bg-background">
+        <div className="max-w-5xl mx-auto">
+          <div className="relative rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm shadow-lg overflow-hidden">
+            {/* Notepad lines effect */}
+            <div className="absolute inset-0 pointer-events-none opacity-5">
+              {Array.from({ length: 30 }).map((_, i) => (
+                <div key={i} className="border-b border-white/20" style={{ height: '32px' }} />
+              ))}
+            </div>
+            <Textarea
+              placeholder="Start writing..."
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              className="min-h-[500px] resize-none text-base bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 text-white leading-relaxed p-6 relative z-10"
+            />
+          </div>
+          <div className="mt-6 p-4 bg-primary/5 border border-primary/20 rounded-lg flex items-center gap-2 text-sm text-muted-foreground">
+            <Lock className="w-4 h-4 text-primary" />
             <span>This note is end-to-end encrypted. Changes auto-save after 1 second.</span>
           </div>
         </div>

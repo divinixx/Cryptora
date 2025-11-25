@@ -146,7 +146,7 @@ export const DashboardPage = () => {
         </ScrollArea>
       </div>
 
-      <div className="flex-1">
+      <div className="flex-1 bg-background/50">
         {isCreating ? (
           <NoteEditor onSave={handleCreateNote} onCancel={() => setIsCreating(false)} />
         ) : selectedNote ? (
@@ -157,9 +157,14 @@ export const DashboardPage = () => {
           />
         ) : (
           <div className="h-full flex items-center justify-center">
-            <div className="text-center space-y-2">
-              <FileText className="w-16 h-16 text-muted-foreground mx-auto" />
-              <p className="text-muted-foreground">Select a note or create a new one</p>
+            <div className="text-center space-y-4 p-8 rounded-2xl border border-border/30 bg-card/30 backdrop-blur-sm">
+              <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
+                <FileText className="w-10 h-10 text-primary" />
+              </div>
+              <div className="space-y-2">
+                <p className="text-lg font-medium text-white">No note selected</p>
+                <p className="text-muted-foreground">Select a note from the sidebar or create a new one</p>
+              </div>
             </div>
           </div>
         )}
