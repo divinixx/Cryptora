@@ -154,6 +154,8 @@ export const DashboardPage = () => {
             note={selectedNote}
             onUpdate={handleUpdateNote}
             onDelete={handleDeleteNote}
+            alias={user?.alias || ''}
+            password={password || ''}
           />
         ) : (
           <div className="h-full flex items-center justify-center">

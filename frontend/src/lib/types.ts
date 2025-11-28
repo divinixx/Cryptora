@@ -56,3 +56,27 @@ export interface AuthContextType {
   logout: () => void;
   isAuthenticated: boolean;
 }
+
+// ============= Shared Note Types =============
+
+export interface ShareNoteRequest {
+  expires_in_hours?: number;
+}
+
+export interface SharedNoteResponse {
+  id: number;
+  note_id: number;
+  share_token: string;
+  share_url: string;
+  created_at: string;
+  expires_at: string | null;
+  view_count: number;
+  is_active: boolean;
+}
+
+export interface SharedNotePublicView {
+  title: string | null;
+  content: string;
+  created_at: string;
+  view_count: number;
+}

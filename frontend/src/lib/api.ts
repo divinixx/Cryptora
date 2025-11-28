@@ -8,6 +8,9 @@ import type {
   DecryptedNote,
   CreateNoteRequest,
   UpdateNoteRequest,
+  ShareNoteRequest,
+  SharedNoteResponse,
+  SharedNotePublicView,
 } from './types';
 
 const API_BASE_URL = 'http://localhost:8000';
@@ -76,5 +79,48 @@ export const notesApi = {
 
   deleteNote: async (alias: string, noteId: number, password: string): Promise<void> => {
     await api.delete(`/${alias}/notes/${noteId}?password=${password}`);
+  },
+
+  // ============= Share Note APIs =============
+
+  shareNote: async (
+    alias: string,
+    noteId: number,
+    password: string,
+    data?: ShareNoteRequest
+  ): Promise<SharedNoteResponse> => {
+    const response = await api.post(
+      `/${alias}/notes/${noteId}/share?password=${password}`,
+      data || {}
+    );
+    return response.data;
+  },
+
+  getShareStatus: async (
+    alias: string,
+    noteId: number,
+    password: string
+  ): Promise<SharedNoteResponse> => {
+    const response = await api.get(
+      `/${alias}/notes/${noteId}/share?password=${password}`
+    );
+    return response.data;
+  },
+
+  unshareNote: async (
+    alias: string,
+    noteId: number,
+    password: string
+  ): Promise<void> => {
+    await api.delete(`/${alias}/notes/${noteId}/share?password=${password}`);
+  },
+};
+
+// ============= Public Shared Note API =============
+
+export const sharedApi = {
+  viewSharedNote: async (shareToken: string): Promise<SharedNotePublicView> => {
+    const response = await api.get(`/shared/${shareToken}`);
+    return response.data;
   },
 };
