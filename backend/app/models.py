@@ -32,27 +32,8 @@ class Note(Base):
     updated_at: Mapped[Optional[datetime]] = mapped_column(nullable=True, onupdate=func.now())
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     user: Mapped["User"] = relationship("User", back_populates="notes")
-    shared_note: Mapped[Optional["SharedNote"]] = relationship("SharedNote", back_populates="note", uselist=False, cascade="all, delete-orphan")
     
     __table_args__ = (
         Index('idx_note_user_active', 'user_id', 'is_active'),
         Index('idx_note_created', 'created_at'),
     )
-
-
-class SharedNote(Base):
-    """Model for shared notes with unique tokens"""
-    __tablename__ = "shared_notes"
-    
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True, autoincrement=True)
-    note_id: Mapped[int] = mapped_column(Integer, ForeignKey('notes.id', ondelete='CASCADE'), nullable=False, unique=True)
-    share_token: Mapped[str] = mapped_column(String(64), unique=True, nullable=False, index=True)
-    encrypted_title: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    encrypted_content: Mapped[str] = mapped_column(Text, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(nullable=False, server_default=func.now())
-    expires_at: Mapped[Optional[datetime]] = mapped_column(nullable=True)
-    view_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
-    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-    note: Mapped["Note"] = relationship("Note", back_populates="shared_note")
-    
-    __table_args__ = (Index('idx_shared_token_active', 'share_token', 'is_active'),)

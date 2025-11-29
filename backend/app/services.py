@@ -1,11 +1,10 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import select
-from app.models import User, Note, SharedNote
+from app.models import User, Note
 from app.schemas import UserCreate, NoteCreate, NoteUpdate
 from app.crypto import CryptoUtils
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Optional, List
-import secrets
 
 
 class UserService:
@@ -106,115 +105,3 @@ class NoteService:
             return CryptoUtils.decrypt(note.encrypted_title, password) if note.encrypted_title else None
         except:
             return None
-
-
-class SharedNoteService:
-    """Service for managing shared notes"""
-    
-    def __init__(self, db: Session):
-        self.db = db
-    
-    def get_shared_note_by_token(self, token: str) -> Optional[SharedNote]:
-        """Get a shared note by its token"""
-        stmt = select(SharedNote).where(
-            SharedNote.share_token == token,
-            SharedNote.is_active == True
-        )
-        shared = self.db.scalars(stmt).first()
-        
-        # Check expiration
-        if shared and shared.expires_at and shared.expires_at < datetime.utcnow():
-            shared.is_active = False
-            self.db.commit()
-            return None
-        
-        return shared
-    
-    def get_shared_note_by_note_id(self, note_id: int) -> Optional[SharedNote]:
-        """Get a shared note by its original note ID"""
-        stmt = select(SharedNote).where(
-            SharedNote.note_id == note_id,
-            SharedNote.is_active == True
-        )
-        return self.db.scalars(stmt).first()
-    
-    def create_shared_note(
-        self, 
-        note: Note, 
-        password: str, 
-        expires_in_hours: Optional[int] = None
-    ) -> SharedNote:
-        """Create a shared version of a note"""
-        # Check if already shared
-        existing = self.get_shared_note_by_note_id(note.id)
-        if existing:
-            return existing
-        
-        # Generate unique token
-        share_token = secrets.token_urlsafe(32)
-        
-        # Re-encrypt with a share-specific key derived from the token
-        note_service = NoteService(self.db)
-        decrypted_title = note_service.decrypt_note_title(note, password)
-        decrypted_content = note_service.decrypt_note_content(note, password)
-        
-        # Encrypt with share token as the key
-        encrypted_title = CryptoUtils.encrypt(decrypted_title, share_token) if decrypted_title else None
-        encrypted_content = CryptoUtils.encrypt(decrypted_content, share_token)
-        
-        # Calculate expiration
-        expires_at = None
-        if expires_in_hours:
-            expires_at = datetime.utcnow() + timedelta(hours=expires_in_hours)
-        
-        shared_note = SharedNote(
-            note_id=note.id,
-            share_token=share_token,
-            encrypted_title=encrypted_title,
-            encrypted_content=encrypted_content,
-            created_at=datetime.utcnow(),
-            expires_at=expires_at,
-            view_count=0,
-            is_active=True
-        )
-        
-        self.db.add(shared_note)
-        self.db.commit()
-        self.db.refresh(shared_note)
-        
-        return shared_note
-    
-    def view_shared_note(self, shared_note: SharedNote) -> dict:
-        """Get decrypted content and increment view count"""
-        # Decrypt using the share token
-        title = None
-        if shared_note.encrypted_title:
-            try:
-                title = CryptoUtils.decrypt(shared_note.encrypted_title, shared_note.share_token)
-            except:
-                pass
-        
-        try:
-            content = CryptoUtils.decrypt(shared_note.encrypted_content, shared_note.share_token)
-        except:
-            content = ""
-        
-        # Increment view count
-        shared_note.view_count += 1
-        self.db.commit()
-        
-        return {
-            "title": title,
-            "content": content,
-            "created_at": shared_note.created_at,
-            "view_count": shared_note.view_count
-        }
-    
-    def delete_shared_note(self, note_id: int) -> bool:
-        """Remove sharing for a note"""
-        shared = self.get_shared_note_by_note_id(note_id)
-        if shared:
-            shared.is_active = False
-            self.db.commit()
-            return True
-        return False

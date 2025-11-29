@@ -2,25 +2,21 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Trash2, Lock, Copy, Check, Share2 } from 'lucide-react';
+import { Trash2, Lock, Copy, Check } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
-import { ShareDialog } from './ShareDialog';
 import type { DecryptedNote } from '@/lib/types';
 
 interface NoteViewerProps {
   note: DecryptedNote;
   onUpdate: (noteId: number, title: string, content: string) => void;
   onDelete: (noteId: number) => void;
-  alias: string;
-  password: string;
 }
 
-export const NoteViewer = ({ note, onUpdate, onDelete, alias, password }: NoteViewerProps) => {
+export const NoteViewer = ({ note, onUpdate, onDelete }: NoteViewerProps) => {
   const [title, setTitle] = useState(note.decrypted_title || '');
   const [content, setContent] = useState(note.decrypted_content);
   const [isSaving, setIsSaving] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [showShareDialog, setShowShareDialog] = useState(false);
   const { toast } = useToast();
 
   // Update local state when note changes
@@ -87,14 +83,6 @@ export const NoteViewer = ({ note, onUpdate, onDelete, alias, password }: NoteVi
         </div>
         <div className="flex gap-2">
           <Button
-            onClick={() => setShowShareDialog(true)}
-            variant="outline"
-            size="sm"
-            title="Share note"
-          >
-            <Share2 className="w-4 h-4" />
-          </Button>
-          <Button
             onClick={handleCopy}
             variant="outline"
             size="sm"
@@ -132,16 +120,6 @@ export const NoteViewer = ({ note, onUpdate, onDelete, alias, password }: NoteVi
           </div>
         </div>
       </div>
-
-      {/* Share Dialog */}
-      <ShareDialog
-        isOpen={showShareDialog}
-        onClose={() => setShowShareDialog(false)}
-        noteId={note.id}
-        noteTitle={title}
-        alias={alias}
-        password={password}
-      />
     </div>
   );
 };

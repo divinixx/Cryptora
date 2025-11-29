@@ -80,30 +80,3 @@ class LoginResponse(BaseModel):
     success: bool
     message: str
     user: Optional[UserResponse] = None
-
-
-# ============= Shared Note Schemas =============
-
-class ShareNoteRequest(BaseModel):
-    """Schema for sharing a note"""
-    expires_in_hours: Optional[int] = Field(None, ge=1, le=720, description="Expiration time in hours (max 30 days)")
-
-class SharedNoteResponse(BaseModel):
-    """Schema for shared note response"""
-    id: int
-    note_id: int
-    share_token: str
-    share_url: str
-    created_at: datetime
-    expires_at: Optional[datetime]
-    view_count: int
-    is_active: bool
-    
-    model_config = {"from_attributes": True}
-
-class SharedNotePublicView(BaseModel):
-    """Schema for public view of a shared note (decrypted)"""
-    title: Optional[str]
-    content: str
-    created_at: datetime
-    view_count: int
