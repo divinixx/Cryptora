@@ -5,9 +5,13 @@ import type {
   RegisterRequest,
   User,
   Note,
+  Folder,
   DecryptedNote,
+  DecryptedFolder,
   CreateNoteRequest,
   UpdateNoteRequest,
+  CreateFolderRequest,
+  UpdateFolderRequest,
 } from './types';
 
 const API_BASE_URL = 'http://localhost:8000';
@@ -31,8 +35,42 @@ export const authApi = {
   },
 };
 
+export const foldersApi = {
+  createFolder: async (
+    alias: string,
+    password: string,
+    data: CreateFolderRequest
+  ): Promise<Folder> => {
+    const response = await api.post(`/${alias}/folders?password=${password}`, data);
+    return response.data;
+  },
+
+  getFolder: async (
+    alias: string,
+    folderId: number,
+    password: string
+  ): Promise<DecryptedFolder> => {
+    const response = await api.get(`/${alias}/folders/${folderId}?password=${password}`);
+    return response.data;
+  },
+
+  updateFolder: async (
+    alias: string,
+    folderId: number,
+    password: string,
+    data: UpdateFolderRequest
+  ): Promise<Folder> => {
+    const response = await api.put(`/${alias}/folders/${folderId}?password=${password}`, data);
+    return response.data;
+  },
+
+  deleteFolder: async (alias: string, folderId: number, password: string): Promise<void> => {
+    await api.delete(`/${alias}/folders/${folderId}?password=${password}`);
+  },
+};
+
 export const notesApi = {
-  getUserWithNotes: async (alias: string): Promise<{ user: User; notes: Note[] }> => {
+  getUserWithNotes: async (alias: string): Promise<{ user: User; notes: Note[]; folders: Folder[] }> => {
     const response = await api.get(`/${alias}`);
     return {
       user: {
@@ -43,6 +81,7 @@ export const notesApi = {
         last_accessed_at: response.data.last_accessed_at,
       },
       notes: response.data.notes,
+      folders: response.data.folders || [],
     };
   },
 

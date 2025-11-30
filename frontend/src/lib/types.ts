@@ -6,9 +6,23 @@ export interface User {
   last_accessed_at: string;
 }
 
+export interface Folder {
+  id: number;
+  user_id: number;
+  encrypted_name: string;
+  color: string | null;
+  icon: string | null;
+  created_at: string;
+}
+
+export interface DecryptedFolder extends Folder {
+  decrypted_name: string;
+}
+
 export interface Note {
   id: number;
   user_id: number;
+  folder_id: number | null;
   encrypted_title: string | null;
   encrypted_content: string;
   content_hash: string;
@@ -37,14 +51,28 @@ export interface RegisterRequest {
   password: string;
 }
 
+export interface CreateFolderRequest {
+  name: string;
+  color?: string;
+  icon?: string;
+}
+
+export interface UpdateFolderRequest {
+  name?: string;
+  color?: string;
+  icon?: string;
+}
+
 export interface CreateNoteRequest {
   title?: string;
   content: string;
+  folder_id?: number;
 }
 
 export interface UpdateNoteRequest {
   title?: string;
   content: string;
+  folder_id?: number;
   previous_hash?: string;
 }
 

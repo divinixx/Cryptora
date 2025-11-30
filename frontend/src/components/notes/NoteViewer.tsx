@@ -2,19 +2,28 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Trash2, Lock, Copy, Check } from 'lucide-react';
+import { Trash2, Lock, Copy, Check, Folder, ChevronDown } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
-import type { DecryptedNote } from '@/lib/types';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu';
+import type { DecryptedNote, DecryptedFolder } from '@/lib/types';
 
 interface NoteViewerProps {
   note: DecryptedNote;
-  onUpdate: (noteId: number, title: string, content: string) => void;
+  folders?: DecryptedFolder[];
+  onUpdate: (noteId: number, title: string, content: string, folderId?: number) => void;
   onDelete: (noteId: number) => void;
 }
 
-export const NoteViewer = ({ note, onUpdate, onDelete }: NoteViewerProps) => {
+export const NoteViewer = ({ note, folders = [], onUpdate, onDelete }: NoteViewerProps) => {
   const [title, setTitle] = useState(note.decrypted_title || '');
   const [content, setContent] = useState(note.decrypted_content);
+  const [currentFolderId, setCurrentFolderId] = useState<number | null>(note.folder_id);
   const [isSaving, setIsSaving] = useState(false);
   const [copied, setCopied] = useState(false);
   const { toast } = useToast();
@@ -23,6 +32,7 @@ export const NoteViewer = ({ note, onUpdate, onDelete }: NoteViewerProps) => {
   useEffect(() => {
     setTitle(note.decrypted_title || '');
     setContent(note.decrypted_content);
+    setCurrentFolderId(note.folder_id);
   }, [note.id]);
 
   // Auto-save after 1 second of inactivity
@@ -40,12 +50,26 @@ export const NoteViewer = ({ note, onUpdate, onDelete }: NoteViewerProps) => {
     return () => clearTimeout(timer);
   }, [title, content]);
 
-  const handleSave = async () => {
-    if (content.trim() && (title !== (note.decrypted_title || '') || content !== note.decrypted_content)) {
+  const handleSave = async (newFolderId?: number) => {
+    if (content.trim() && (title !== (note.decrypted_title || '') || content !== note.decrypted_content || newFolderId !== undefined)) {
       setIsSaving(true);
-      await onUpdate(note.id, title, content);
+      await onUpdate(note.id, title, content, newFolderId);
       setIsSaving(false);
     }
+  };
+
+  const handleMoveToFolder = async (folderId: number | null) => {
+    setCurrentFolderId(folderId);
+    setIsSaving(true);
+    // Use -1 to indicate "remove from folder"
+    await onUpdate(note.id, title, content, folderId === null ? -1 : folderId);
+    setIsSaving(false);
+    toast({
+      title: folderId ? 'Moved to folder' : 'Removed from folder',
+      description: folderId 
+        ? `Note moved to "${folders.find(f => f.id === folderId)?.decrypted_name}"`
+        : 'Note is now unfiled',
+    });
   };
 
   const handleCopy = async () => {
@@ -66,6 +90,8 @@ export const NoteViewer = ({ note, onUpdate, onDelete }: NoteViewerProps) => {
     }
   };
 
+  const currentFolder = folders.find(f => f.id === currentFolderId);
+
   return (
     <div className="h-full flex flex-col">
       <div className="border-b border-border p-4 flex items-center justify-between">
@@ -77,9 +103,38 @@ export const NoteViewer = ({ note, onUpdate, onDelete }: NoteViewerProps) => {
             onChange={(e) => setTitle(e.target.value)}
             className="text-xl font-semibold border-0 bg-transparent px-0 focus-visible:ring-0 focus-visible:ring-offset-0"
           />
-          {isSaving && (
-            <p className="text-sm text-muted-foreground mt-1">Saving...</p>
-          )}
+          <div className="flex items-center gap-2 mt-1">
+            {isSaving && (
+              <span className="text-sm text-muted-foreground">Saving...</span>
+            )}
+            {folders.length > 0 && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground">
+                    <Folder className="w-3 h-3 mr-1" />
+                    {currentFolder ? currentFolder.decrypted_name : 'No folder'}
+                    <ChevronDown className="w-3 h-3 ml-1" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                  <DropdownMenuItem onClick={() => handleMoveToFolder(null)}>
+                    <span className="text-muted-foreground">No folder</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  {folders.map((folder) => (
+                    <DropdownMenuItem
+                      key={folder.id}
+                      onClick={() => handleMoveToFolder(folder.id)}
+                      className={currentFolderId === folder.id ? 'bg-accent' : ''}
+                    >
+                      <Folder className="w-4 h-4 mr-2" />
+                      {folder.decrypted_name}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
         </div>
         <div className="flex gap-2">
           <Button
